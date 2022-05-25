@@ -1,0 +1,36 @@
+{
+  "name": "todoapi",
+  "version": "1.0.0",
+  "description": "todo api and web application",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "nodemon app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VidyaConsultancy/todoapi.git"
+  },
+  "keywords": [
+    "todo",
+    "express",
+    "nodejs",
+    "restful",
+    "api",
+    "web",
+    "app",
+    "mongodb"
+  ],
+  "author": "Arpit Jain",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VidyaConsultancy/todoapi/issues"
+  },
+  "homepage": "https://github.com/VidyaConsultancy/todoapi#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  }
+}
