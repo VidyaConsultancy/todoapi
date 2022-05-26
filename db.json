@@ -1,8 +1,5 @@
 {
-  "users": [
-    { "id": 1, "name": "John Doe", "department": "HR" },
-    { "id": 2, "name": "Jane Doe", "department": "Marketing" }
-  ],
+  "users": [{ "id": 8, "name": "Kartik", "department": "IT" }],
   "todos": [
     { "id": 1, "todo": "Learn nodejs", "isCompleted": false, "userId": 1 },
     { "id": 2, "todo": "Learn expressjs", "isCompleted": false, "userId": 2 }

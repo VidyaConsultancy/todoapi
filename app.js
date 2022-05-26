@@ -7,6 +7,9 @@ const server = http.createServer(app);
 const PORT = 3000;
 const cacheMemory = {};
 
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true }));
+
 app.get("/", (req, res, next) => {
   console.log(req.headers);
   return res.send("Welcome to express server");
@@ -98,6 +101,86 @@ app.get("/users/:userId", (req, res, next) => {
   });
 });
 
+app.post("/users", (req, res) => {
+  const user = req.body;
+  const response = {
+    success: true,
+    code: 201,
+    message: "user created successfully",
+    data: null,
+    error: null,
+    resource: req.url,
+  };
+  if (!user || Object.keys(user).length === 0) {
+    response.success = false;
+    response.code = 400;
+    response.message = "Invalid request data";
+    response.error = "Invalid request data";
+    return res.status(400).json(response);
+  }
+  if (!user.id || (user.id && isNaN(Number(user.id)))) {
+    response.success = false;
+    response.code = 400;
+    response.message = "Invalid request data. Id is required";
+    response.error = "Invalid request data. Id is required";
+    return res.status(400).json(response);
+  }
+  if (!user.name || (user.name && user.name.trim().length === 0)) {
+    response.success = false;
+    response.code = 400;
+    response.message = "Invalid request data. Name is required";
+    response.error = "Invalid request data. Name is required";
+    return res.status(400).json(response);
+  }
+  if (
+    !user.department ||
+    (user.department && user.department.trim().length === 0)
+  ) {
+    response.success = false;
+    response.code = 400;
+    response.message = "Invalid request data. Department is required";
+    response.error = "Invalid request data. Department is required";
+    return res.status(400).json(response);
+  }
+  fs.readFile("./db.json", (err, data) => {
+    if (err) {
+      response.success = false;
+      response.code = 500;
+      response.message = err.message;
+      response.error = err;
+      return res.status(500).json(response);
+    }
+    const dbData = JSON.parse(data.toString());
+    const { users } = dbData;
+    const isUserExist = users.find((userObj) => userObj.id === +user.id);
+    if (isUserExist) {
+      response.success = false;
+      response.code = 400;
+      response.message = "User id already exist.";
+      response.error = "User id already exist.";
+      return res.status(400).json(response);
+    }
+    const formattedUser = {
+      id: +user.id,
+      name: user.name.trim(),
+      department: user.department.trim(),
+    };
+    users.push(formattedUser);
+    dbData.users = users;
+    fs.writeFile("./db.json", JSON.stringify(dbData), (err) => {
+      if (err) {
+        response.success = false;
+        response.code = 500;
+        response.message = err.message;
+        response.error = err;
+        return res.status(500).json(response);
+      }
+      response.data = { user: formattedUser };
+      return res.status(201).send(response);
+    });
+  });
+});
+
 app.get("/todos", (req, res, next) => {
   const { userId } = req.query;
   fs.readFile("./db.json", (err, data) => {
@@ -152,12 +235,27 @@ app.get("/todos", (req, res, next) => {
   });
 });
 
+const middleware = (req, res, next) => {
+  console.log("I am in between");
+  return res.send("I cut the req res in between");
+};
+
+const middlewareWithOptions = (options) => {
+  return (req, res, next) => {
+    console.log("I am in between");
+    return res.send("I cut the req res in between");
+  };
+};
+
 app.all(
   "/test",
   (req, res, next) => {
     console.log("I am in between");
+    console.log(req.body);
     return res.send("I cut the req res in between");
   },
+  middleware,
+  middlewareWithOptions(),
   (req, res, next) => {
     return res.send("I am test route");
   }
