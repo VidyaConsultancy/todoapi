@@ -132,6 +132,32 @@ a:focus {
 #menu-toggle {
   display: none;
 }
+.login-form {
+  max-width: 50%;
+  margin: 0 auto;
+  display: grid;
+  background-color: #f8f8f8;
+  padding: 2em 2em;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2em;
+}
+.form-input {
+  padding: 1em;
+  resize: none;
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 0.75rem;
+}
+.form-group {
+  grid-column: 1 / -1;
+}
+.form-group.span-half {
+  grid-column: auto / span 4;
+}
+.form-group:last-child {
+  text-align: center;
+}
 @media screen and (max-width: 800px) {
   #menu-toggle {
     display: initial;

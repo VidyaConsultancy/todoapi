@@ -23,6 +23,11 @@ router.get("/login", (req, res) => {
   });
 });
 
+router.post("/login", (req, res) => {
+  console.log(req.body);
+  return res.send("Login Successful");
+});
+
 router.get("/", (req, res) => {
   return res.render("index", {
     title: "Todo app | Home",
