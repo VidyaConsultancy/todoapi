@@ -1,0 +1,18 @@
+<header class="header" id="home">
+  <div class="container">
+    <nav class="navbar">
+      <div class="logo">
+        <a href="/">DA</a>
+      </div>
+      <button class="btn btn-primary" id="menu-toggle" tabindex="1">
+        <span class="fa-solid fa-bars"></span>
+      </button>
+      <menu class="main-navbar">
+        <li <% if(activeLink === 'home') { %> class="active" <% } %>><a href="/">Home</a></li>
+        <li <% if(activeLink === 'about') { %> class="active" <% } %>><a href="/about">About</a></li>
+        <li <% if(activeLink === 'contact') { %> class="active" <% } %>><a href="/contact">Contact</a></li>
+        <li <% if(activeLink === 'login') { %> class="active" <% } %>><a href="/login">Login</a></li>
+      </menu>
+    </nav>
+  </div>
+</header>
