@@ -1,35 +1,41 @@
 const fs = require("fs");
 
 const { DB_PATH, isValid, isValidString } = require("../utils");
+const { dbService } = require("../db/db.service");
 
-const getAllUsers = (req, res) => {
-  fs.readFile(DB_PATH, (err, data) => {
-    if (err) {
-      // res.statusCode = 500;
-      // res.statusMessage = err.message;
-      return res.status(500).json({
-        success: false,
-        code: 500,
-        message: err.message,
-        error: err,
-        data: null,
-        resource: req.originalUrl,
-      });
-    }
+const getAllUsers = async (req, res) => {
+  // const tests = await req.db.collection("tests").find({}).toArray();
+  // const tests = await res.locals.db.collection("tests").find({}).toArray();
+  const tests = await dbService.db.collection("tests").find({}).toArray();
+  // res.locals.client.close().then(_ => console.log("connection closed"))
+  return res.status(200).json(tests);
+  // fs.readFile(DB_PATH, (err, data) => {
+  //   if (err) {
+  //     // res.statusCode = 500;
+  //     // res.statusMessage = err.message;
+  //     return res.status(500).json({
+  //       success: false,
+  //       code: 500,
+  //       message: err.message,
+  //       error: err,
+  //       data: null,
+  //       resource: req.originalUrl,
+  //     });
+  //   }
 
-    const dataString = data.toString();
-    const dbObject = JSON.parse(dataString);
-    const users = dbObject.users;
+  //   const dataString = data.toString();
+  //   const dbObject = JSON.parse(dataString);
+  //   const users = dbObject.users;
 
-    return res.json({
-      success: true,
-      code: 200,
-      message: "User list retrieved",
-      error: null,
-      data: { users },
-      resource: req.originalUrl,
-    });
-  });
+  //   return res.json({
+  //     success: true,
+  //     code: 200,
+  //     message: "User list retrieved",
+  //     error: null,
+  //     data: { users },
+  //     resource: req.originalUrl,
+  //   });
+  // });
 };
 
 const getUserById = (req, res) => {
