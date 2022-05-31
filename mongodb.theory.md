@@ -14,3 +14,17 @@ key-value pair Redis, memcache
 document {} Mongodb, firebase realitime database, dynamodb
 extended columns Cassandra, Hbase
 graph NeoJS
+
+### Mondodb datatypes
+String
+Number
+Boolean
+Object
+Array
+ObjectId => 12 bytes hexadecimal, 4 current timestamp, 3 bytes machine id, 2 bytes process id of mongodb server, 3 bytes incremental value
+undefined
+null
+binary
+date
+timestamps
+geospatial
