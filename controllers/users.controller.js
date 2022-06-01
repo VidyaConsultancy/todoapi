@@ -121,8 +121,102 @@ const createUser = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  const { userId } = req.params;
+  const userData = req.body;
+  if (!isValid(userData) || !isValidObject(userData)) {
+    return res.status(400).json({
+      success: false,
+      code: 400,
+      message: "Empty request body, nothing to update.",
+      error: null,
+      data: null,
+      resource: req.originalUrl,
+    });
+  }
+
+  if (isValid(userData.email) && isValidEmail(userData.email)) {
+    try {
+      const isEmailExist = await UserModel.findOne({
+        email: userData.email,
+        _id: { $ne: userId },
+      });
+      if (isEmailExist)
+        throw new Error(
+          `This email ${userData.email} id is already registered.`
+        );
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        code: 400,
+        message: error.message,
+        error: error,
+        data: null,
+        resource: req.originalUrl,
+      });
+    }
+  }
+  try {
+    const isUserExist = await UserModel.findById(userId);
+    if (!isUserExist)
+      throw new Error("Invalid user id. User does not exist with this id.");
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      userId,
+      { $set: userData },
+      { new: true }
+    );
+    return res.status(200).json({
+      success: true,
+      code: 200,
+      message: "User updated successfully",
+      error: null,
+      data: { user: updatedUser },
+      resource: req.originalUrl,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      code: 404,
+      message: error.message,
+      error: error,
+      data: null,
+      resource: req.originalUrl,
+    });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const isUserExist = await UserModel.findById(userId);
+    if (!isUserExist)
+      throw new Error("Invalid user id. User does not exist with this id.");
+    isUserExist.delete();
+    return res.status(200).json({
+      success: true,
+      code: 200,
+      message: "User deleted successfully",
+      error: null,
+      data: { user: isUserExist },
+      resource: req.originalUrl,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      code: 404,
+      message: error.message,
+      error: error,
+      data: null,
+      resource: req.originalUrl,
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
   createUser,
+  updateUser,
+  deleteUser,
 };
