@@ -9,8 +9,9 @@ const app = express();
 const server = http.createServer(app);
 const PORT = 3000;
 
-const apiRouter = require("./routes/apis");
+const apiRouter = require("./routes/apis/index");
 const webRouter = require("./routes/web");
+const TodoModel = require("./models/todos.model");
 
 app.use(logger("dev"));
 app.use(express.json({ limit: "5mb" }));
@@ -20,12 +21,24 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
-mongoose.connect("mongodb://localhost:27017/todos")
-  .then(res => console.log(`Mongoose connected to db successfully ${res}`))
-  .catch(err => console.error(`Mongoose connection to db failed ${err.message}`));
+mongoose
+  .connect("mongodb://localhost:27017/todos")
+  .then((res) => console.log(`Mongoose connected to db successfully ${res}`))
+  .catch((err) =>
+    console.error(`Mongoose connection to db failed ${err.message}`)
+  );
 
 app.use("/", webRouter);
 app.use("/api", apiRouter);
+// app.get("/api/todos", (req, res) => {
+//   TodoModel.find({}) // db.todos.find({}) or db.collection("todos").find()
+//     .then((todos) => {
+//       return res.status(200).json(todos);
+//     })
+//     .catch((error) => {
+//       return res.status(500).json(error);
+//     });
+// });
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

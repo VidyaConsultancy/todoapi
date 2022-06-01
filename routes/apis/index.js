@@ -1,10 +1,18 @@
 const express = require("express");
+
+const { usersController } = require("../../controllers");
+const { todosController } = require("../../controllers");
+
 const router = express.Router();
 
-const usersRouter = require("./users.routes");
-const todosRouter = require("./todos.routes");
+/* Users routes */
+router.get("/users", usersController.getAllUsers);
+router.get("/users/:userId", usersController.getUserById);
+router.post("/users", usersController.createUser);
+router.put("/users/:userId", usersController.updateUser);
+router.delete("/users/:userId", usersController.deleteUser);
 
-router.use("/users", usersRouter);
-router.use("/todos", todosRouter);
+/* Todos routes */
+router.get("/todos", todosController.getAllTodos);
 
 module.exports = router;
