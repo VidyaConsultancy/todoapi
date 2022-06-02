@@ -11,7 +11,7 @@ const PORT = 3000;
 
 const apiRouter = require("./routes/apis/index");
 const webRouter = require("./routes/web");
-const TodoModel = require("./models/todos.model");
+const ProductModel = require("./models/products.model");
 
 app.use(logger("dev"));
 app.use(express.json({ limit: "5mb" }));
@@ -30,15 +30,71 @@ mongoose
 
 app.use("/", webRouter);
 app.use("/api", apiRouter);
-// app.get("/api/todos", (req, res) => {
-//   TodoModel.find({}) // db.todos.find({}) or db.collection("todos").find()
-//     .then((todos) => {
-//       return res.status(200).json(todos);
-//     })
-//     .catch((error) => {
-//       return res.status(500).json(error);
-//     });
-// });
+app.get("/api/test", async (req, res) => {
+  const reg = new RegExp("no", "i");
+  const products = await ProductModel.find(
+    { "images.title": { $regex: reg } },
+    { id: 1, name: 1, price: 1, taxes: 1, tags: 1 }
+  );
+  // const products = await ProductModel.find(
+  //   {
+  //     $or: [
+  //       {
+  // { name: { $regex: /^i[a-z]+/, $options: "ig" } },
+  //         net_price: { $gte: 100, $lte: 500 },
+  //         price: "1023508.71",
+  //       },
+  //       { name: "Quod tempora aut est et." },
+  //     ],
+  //   },
+  //   { id: 1, name: 1, price: 1, net_price: 1 }
+  // );
+  // const products = await ProductModel.find({}, { name: 1, price: 1}).sort({ name: 1, price: -1 }).limit(5).skip(5);
+  return res.json({ products, count: products.length });
+});
+app.get("/api/update-test", async (req, res) => {
+  const product = await ProductModel.findOne({ id: 21 });
+  product.tags = ["first tag", "second tag", "random", "non-random"];
+  await product.save();
+  // const updatedProduct = await ProductModel.updateOne(
+  //   { id: 21 },
+  //   { $set: { price: 3299 }},
+  //   {
+  //     new: true,
+  //     upsert: true,
+  //   }
+  // );
+  // const updatedProduct = await ProductModel.findOneAndUpdate(
+  //   { id: 2 },
+  //   { $set: { "images.$[elem].title": "Laudantium sapiente qui totam et" } },
+  //   {
+  //     new: true,
+  //     arrayFilters: [{ "elem.description": { $regex: /molestias/i } }],
+  //   }
+  // );
+  // const updatedProduct = await ProductModel.findOneAndUpdate(
+  //   { "images.title": { $regex: /no/i } },
+  //   { $pop: { tags: -1 } },
+  //   { new: true }
+  // );
+  // const updatedProduct = await ProductModel.updateMany(
+  //   { "images.title": { $regex: /no/i } },
+  //   { $addToSet: { tags: "featured" } },
+  //   { new: true }
+  // );
+  // const updatedProduct = await ProductModel.updateMany(
+  //   { "images.title": { $regex: /no/i } },
+  //   { $push: { tags: "featured" } },
+  //   { new: true }
+  // );
+  // const updatedProduct = await ProductModel.findOneAndUpdate(
+  //   { "images.title": { $regex: /no/i } },
+  //   { $inc: { taxes: -10 }, $set: { price: 1029 } },
+  //   { new: true }
+  // );
+  return res.json({ product });
+});
+// update products set taxes = taxes + 2, price = 238 where id = 2;
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
