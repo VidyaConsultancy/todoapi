@@ -4,6 +4,7 @@ const createError = require("http-errors");
 const path = require("path");
 const logger = require("morgan");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +17,7 @@ const ProductModel = require("./models/products.model");
 app.use(logger("dev"));
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: "http://localhost:3001" }));
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -28,8 +30,38 @@ mongoose
     console.error(`Mongoose connection to db failed ${err.message}`)
   );
 
+class InvalidObjectIdError extends Error {
+  constructor(message = "Invalid object id", code = 400) {
+    super(message);
+    this.code = code;
+  }
+}
+
 app.use("/", webRouter);
+// app.use("/", (req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3001");
+//   if(req.method === "OPTIONS") {
+//     console.log('OPTIONS request');
+//     return res.status(200).send("OK");
+//   }
+//   next();
+// })
+
 app.use("/api", apiRouter);
+app.get("/api/test/:testId", async (req, res) => {
+  const { testId } = req.params;
+  try {
+    const isValidObjectId = mongoose.isValidObjectId(testId);
+    if (!isValidObjectId) throw new InvalidObjectIdError();
+    const product = await ProductModel.findById(testId);
+    return res.json({ product });
+  } catch (error) {
+    console.error(error.message, error.code);
+    return res
+      .status(error.code)
+      .json({ message: error.message, code: error.code });
+  }
+});
 app.get("/api/test", async (req, res) => {
   const reg = new RegExp("no", "i");
   const products = await ProductModel.find(

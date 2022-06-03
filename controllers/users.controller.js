@@ -100,6 +100,22 @@ const createUser = async (req, res) => {
     response.error = "Invalid request data. Email is required";
     return res.status(400).json(response);
   }
+  try {
+    const isEmailExist = await UserModel.findOne({
+      email: user.email,
+    });
+    if (isEmailExist)
+      throw new Error(`This email ${user.email} id is already registered.`);
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      code: 400,
+      message: error.message,
+      error: error,
+      data: null,
+      resource: req.originalUrl,
+    });
+  }
   const cleanedUserData = {
     name: user.name.trim(),
     email: user.email.trim(),
