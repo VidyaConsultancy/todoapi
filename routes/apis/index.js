@@ -1,7 +1,6 @@
 const express = require("express");
 
-const { usersController } = require("../../controllers");
-const { todosController } = require("../../controllers");
+const { usersController, todosController, authController } = require("../../controllers");
 
 const router = express.Router();
 
@@ -14,5 +13,8 @@ router.delete("/users/:userId", usersController.deleteUser);
 
 /* Todos routes */
 router.get("/todos", todosController.getAllTodos);
+
+/* Auth routes */
+router.post("/login", authController.login);
 
 module.exports = router;

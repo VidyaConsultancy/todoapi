@@ -1,11 +1,11 @@
-const fs = require("fs");
+const bcrypt = require("bcrypt");
 
 const {
-  DB_PATH,
   isValid,
   isValidString,
   isValidObject,
   isValidEmail,
+  SALT,
 } = require("../utils");
 const UserModel = require("../models/users.model");
 
@@ -116,10 +116,11 @@ const createUser = async (req, res) => {
       resource: req.originalUrl,
     });
   }
+  const hashPassword = await bcrypt.hash(user.password.trim(), SALT);
   const cleanedUserData = {
     name: user.name.trim(),
     email: user.email.trim(),
-    password: user.password.trim(),
+    password: hashPassword,
   };
   if (user.address) {
     cleanedUserData.address = user.address;
@@ -176,6 +177,12 @@ const updateUser = async (req, res) => {
     const isUserExist = await UserModel.findById(userId);
     if (!isUserExist)
       throw new Error("Invalid user id. User does not exist with this id.");
+
+    if(userData.password) {
+      const saltRounds = 16;
+      const salt = await bcrypt.genSalt(saltRounds);
+      userData.password = await bcrypt.hash(userData.password, SALT);
+    }
 
     const updatedUser = await UserModel.findByIdAndUpdate(
       userId,

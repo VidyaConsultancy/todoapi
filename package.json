@@ -28,9 +28,11 @@
   },
   "homepage": "https://github.com/VidyaConsultancy/todoapi#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "ejs": "^3.1.8",
     "express": "^4.18.1",
+    "helmet": "^5.1.0",
     "http-errors": "^2.0.0",
     "mongoose": "^6.3.5",
     "morgan": "^1.10.0"
