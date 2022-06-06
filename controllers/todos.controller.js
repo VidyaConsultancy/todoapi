@@ -223,9 +223,66 @@ const deleteTodo = async (req, res) => {
   }
 };
 
+const updateTodoStatus = async (req, res) => {
+  const todoId = req.params.todoId;
+  if (!isValidObjectId(todoId)) {
+    return res.status(400).json({
+      success: false,
+      code: 400,
+      message: "Invalid todo id",
+      data: null,
+      error: null,
+      resource: req.originalUrl,
+    });
+  }
+  try {
+    const todo = await TodoModel.findOne({ _id: todoId, isDeleted: false });
+    if (!todo) {
+      return res.status(404).json({
+        success: false,
+        code: 404,
+        message: "Invalid request, todo item does not exist",
+        data: null,
+        error: null,
+        resource: req.originalUrl,
+      });
+    }
+    if (todo.userId.toString() !== res.locals.userId) {
+      return res.status(403).json({
+        success: false,
+        code: 403,
+        message: "Invalid request, forbidden",
+        data: null,
+        error: null,
+        resource: req.originalUrl,
+      });
+    }
+    todo.isCompleted = Boolean(req.body.isCompleted);
+    await todo.save();
+    return res.status(200).json({
+      success: true,
+      code: 200,
+      message: "Todo status updated successfully",
+      data: { todo },
+      error: null,
+      resource: req.originalUrl,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      code: 500,
+      message: error.message,
+      data: null,
+      error: error,
+      resource: req.originalUrl,
+    });
+  }
+}
+
 module.exports = {
   getAllTodos: getAllTodos,
   createTodo,
   updateTodo,
   deleteTodo,
+  updateTodoStatus,
 };

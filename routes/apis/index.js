@@ -1,6 +1,10 @@
 const express = require("express");
 
-const { usersController, todosController, authController } = require("../../controllers");
+const {
+  usersController,
+  todosController,
+  authController,
+} = require("../../controllers");
 const { authMiddleware } = require("../../middlewares/auth.middleware");
 
 const router = express.Router();
@@ -16,6 +20,11 @@ router.delete("/users/:userId", usersController.deleteUser);
 router.get("/todos", authMiddleware, todosController.getAllTodos);
 router.post("/todos", authMiddleware, todosController.createTodo);
 router.put("/todos/:todoId", authMiddleware, todosController.updateTodo);
+router.patch(
+  "/todos/:todoId",
+  authMiddleware,
+  todosController.updateTodoStatus
+);
 router.delete("/todos/:todoId", authMiddleware, todosController.deleteTodo);
 
 /* Auth routes */
