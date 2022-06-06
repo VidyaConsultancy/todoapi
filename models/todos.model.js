@@ -8,6 +8,7 @@ const todoSchema = new mongoose.Schema(
     // createdAt:{type:Date,default:new Date()},
     // modifiedAt:{type:Date,default:new Date()},
     deletedAt: { type: Date, default: null },
+    userId: { type: mongoose.SchemaTypes.ObjectId, ref: "User"}
   },
   { timestamps: true }
 );

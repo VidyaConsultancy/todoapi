@@ -13,6 +13,7 @@ const authMiddleware = async (req, res, next) => {
         "Unauthorized access, missing authorization information in the request",
       data: null,
       error: null,
+      resource: req.originalUrl,
     });
   }
 
@@ -26,24 +27,24 @@ const authMiddleware = async (req, res, next) => {
         "Unauthorized access, authorization information is not in a valid format",
       data: null,
       error: null,
+      resource: req.originalUrl,
     });
   }
 
   try {
     const decodedToken = await jwt.verify(token, JWT_SECRET);
     res.locals.userId = decodedToken.userId;
+    next();
   } catch (error) {
     return res.status(401).json({
       success: false,
       code: 401,
-      message:
-        "Unauthorized access " + error.message,
+      message: "Unauthorized access " + error.message,
       data: null,
       error: null,
+      resource: req.originalUrl,
     });
   }
-
-  next();
 };
 
 module.exports.authMiddleware = authMiddleware;
