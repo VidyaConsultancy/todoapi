@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 
 const {
   isValid,
@@ -129,7 +130,63 @@ const createUser = async (req, res) => {
     const newUser = new UserModel(cleanedUserData);
     await newUser.save();
     response.data = { user: newUser };
-    return res.status(201).json(response);
+    const smtpTransporter = nodemailer.createTransport({
+      host: "smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        user: "9b5d1fd4eb0949",
+        pass: "6237a14066a3fa",
+      },
+    });
+    smtpTransporter.verify(async function (error, success) {
+      if(error) {
+        console.error(`Error connecting to mail provider`, error.message);
+      } else {
+        let info = await smtpTransporter.sendMail({
+          from: '"Todo App" <contact@todoapp.com>', // sender address
+          to: newUser.email, // list of receivers
+          subject: "Welcome to Todo app ✔", // Subject line
+          text: `Hello, ${user.name}, Welcome to Todo app. Let's get started and created some awesome todos.`, // plain text body
+          html: `<!DOCTYPE html>
+              <html lang="en">
+              <head>
+                  <meta charset="UTF-8">
+                  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>Document</title>
+                  <style>
+                    body {
+                      background-color: #ffffff;
+                    }
+                    .content {
+                      width: 600px;
+                      margin-left: auto;
+                      margin-right: auto;
+                      background-color: #f8f8f8;
+                    }
+                  </style>
+              </head>
+              <body>
+                  <div class="content">
+                      <div class="header">
+                          <h1>Hello ${user.name},</h1>
+                          <p>Welcome to Todo app</p>
+                      </div>
+                      <div class="body">
+                          <button>Let's get started</button>
+                      </div>
+                      <div class="footer">
+                          Thank you,
+                          Team TodoApp
+                      </div>
+                  </div>
+              </body>
+              </html>`, // html body
+        });
+        console.log("Message sent: %s", info.messageId);
+        return res.status(201).json(response);
+      }
+    })
   } catch (error) {
     response.error = error;
     response.message = error.message;
@@ -178,7 +235,7 @@ const updateUser = async (req, res) => {
     if (!isUserExist)
       throw new Error("Invalid user id. User does not exist with this id.");
 
-    if(userData.password) {
+    if (userData.password) {
       const saltRounds = 16;
       const salt = await bcrypt.genSalt(saltRounds);
       userData.password = await bcrypt.hash(userData.password, SALT);
