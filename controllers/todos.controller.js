@@ -1,11 +1,7 @@
 const { isValidObjectId } = require("mongoose");
 
 const TodoModel = require("../models/todos.model");
-const {
-  isValid,
-  isValidString,
-  isValidObject,
-} = require("../utils");
+const { isValid, isValidString, isValidObject } = require("../utils");
 
 const getAllTodos = async (req, res) => {
   try {
@@ -134,7 +130,7 @@ const updateTodo = async (req, res) => {
         resource: req.originalUrl,
       });
     }
-    if(todo.userId.toString() !== res.locals.userId) {
+    if (todo.userId.toString() !== res.locals.userId) {
       return res.status(403).json({
         success: false,
         code: 403,
@@ -277,7 +273,61 @@ const updateTodoStatus = async (req, res) => {
       resource: req.originalUrl,
     });
   }
-}
+};
+
+const getTodoById = async (req, res) => {
+  const todoId = req.params.todoId;
+  if (!isValidObjectId(todoId)) {
+    return res.status(400).json({
+      success: false,
+      code: 400,
+      message: "Invalid todo id",
+      data: null,
+      error: null,
+      resource: req.originalUrl,
+    });
+  }
+  try {
+    const todo = await TodoModel.findOne({ _id: todoId, isDeleted: false });
+    if (!todo) {
+      return res.status(404).json({
+        success: false,
+        code: 404,
+        message: "Invalid request, todo item does not exist",
+        data: null,
+        error: null,
+        resource: req.originalUrl,
+      });
+    }
+    if (todo.userId.toString() !== res.locals.userId) {
+      return res.status(403).json({
+        success: false,
+        code: 403,
+        message: "Invalid request, forbidden",
+        data: null,
+        error: null,
+        resource: req.originalUrl,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      code: 200,
+      message: "Todo details",
+      data: { todo },
+      error: null,
+      resource: req.originalUrl,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      code: 500,
+      message: error.message,
+      data: null,
+      error: error,
+      resource: req.originalUrl,
+    });
+  }
+};
 
 module.exports = {
   getAllTodos: getAllTodos,
@@ -285,4 +335,5 @@ module.exports = {
   updateTodo,
   deleteTodo,
   updateTodoStatus,
+  getTodoById,
 };

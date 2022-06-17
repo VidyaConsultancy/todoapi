@@ -19,6 +19,7 @@ router.delete("/users/:userId", usersController.deleteUser);
 /* Todos routes */
 router.get("/todos", authMiddleware, todosController.getAllTodos);
 router.post("/todos", authMiddleware, todosController.createTodo);
+router.get("/todos/:todoId", authMiddleware, todosController.getTodoById);
 router.put("/todos/:todoId", authMiddleware, todosController.updateTodo);
 router.patch(
   "/todos/:todoId",
