@@ -5,6 +5,7 @@ const path = require("path");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 const server = http.createServer(app);
@@ -27,7 +28,7 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
 mongoose
-  .connect("mongodb://localhost:27017/todos")
+  .connect(process.env.MONGODB_URI)
   .then((res) => console.log(`Mongoose connected to db successfully ${res}`))
   .catch((err) =>
     console.error(`Mongoose connection to db failed ${err.message}`)
